@@ -1,0 +1,37 @@
+{
+  "name": "bop-bob-backend",
+  "version": "1.0.0",
+  "description": "BOP Agencia — Bob Web Assistant Secure Backend API (Zero External Dependencies)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node test/api-test.js",
+    "test:knowledge": "node test/knowledge-test.js",
+    "test:retrieval": "node test/retrieval-test.js",
+    "test:conversation": "node test/conversation-test.js",
+    "test:frontend": "node test/frontend-contract-test.js",
+    "test:all": "node test/api-test.js && node test/knowledge-test.js && node test/retrieval-test.js && node test/conversation-test.js && node test/frontend-contract-test.js",
+    "knowledge:ingest": "node knowledge/ingest.js",
+    "knowledge:status": "node knowledge/status.js",
+    "knowledge:search": "node retrieval/search-cli.js"
+  },
+  "keywords": [
+    "bop-agencia",
+    "bob-assistant",
+    "backend-api"
+  ],
+  "author": "BOP Agencia",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "mammoth": "^1.13.0",
+    "unpdf": "^1.8.1"
+  },
+  "dependencies": {
+    "@google/genai": "^2.29.1"
+  }
+}

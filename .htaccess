@@ -1,0 +1,47 @@
+# ==============================================================================
+# BOP AGENCIA — Configuración de Servidor para Namecheap (cPanel / Apache)
+# ==============================================================================
+
+# 1. Asegurar codificación UTF-8
+AddDefaultCharset UTF-8
+
+# 2. Tipos MIME para formatos modernos
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType image/avif .avif
+  AddType image/svg+xml .svg
+  AddType font/woff2 .woff2
+</IfModule>
+
+# 3. Compresión GZIP / Deflate para carga ultra rápida
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# 4. Políticas de Caché del Navegador (Optimización de velocidad y LCP)
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+
+  # HTML: sin caché prolongada para cambios inmediatos
+  ExpiresByType text/html "access plus 0 seconds"
+
+  # CSS y JavaScript: 1 mes
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+
+  # Imágenes (Secuencia WebP, logos): 1 año (Inmutables)
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+</IfModule>
+
+# 5. Cabeceras de Seguridad Básicas
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

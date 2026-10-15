@@ -1,0 +1,55 @@
+# Environment and Secret files
+.env
+.env.*
+backend/bob/.env
+.env*.local
+*.key
+*.pem
+*.cert
+
+# Node dependencies and build
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating System files
+Thumbs.db
+.DS_Store
+
+# Temporary scratch & test artifacts
+scratch/
+scratch_edge/
+*.tmp
+
+# Bob Knowledge Ingestion — Protect local confidential sources from accidental git commits
+backend/bob/botinfo/sources/**
+!backend/bob/botinfo/sources/**/.gitkeep
+!backend/bob/botinfo/sources/**/README.md
+
+# Deployment archives / backups
+*.zip
+Pagina anterior/
+
+# Visual QA / screenshots / scratch artifacts
+captures/
+temp_test/
+scratch/
+scratch_edge/
+scratch_*.jpg
+scratch_*.jpeg
+scratch_*.png
+screenshot*.png
+section2a*.png
+crop_dark_logo.png
+
+# Generated visual/testing artifacts under tools
+tools/*.jpg
+tools/test_cutouts/
+
+# Runtime logs
+*.log
+
+# Node runtime
+backend/bob/node_modules/
+node_modules/

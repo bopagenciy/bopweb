@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-10-13T23:47:57.292Z",
+  "source_count": 15,
+  "document_count": 1,
+  "website_source_count": 14,
+  "chunk_count": 47,
+  "language_counts": {
+    "es": 8,
+    "en": 7,
+    "unknown": 0
+  },
+  "chunk_language_counts": {
+    "es": 39,
+    "en": 8,
+    "unknown": 0
+  },
+  "format_counts": {
+    "md": 1,
+    "html_extracted": 14
+  },
+  "needs_ocr_count": 0,
+  "failed_count": 0,
+  "failed_sources": []
+}

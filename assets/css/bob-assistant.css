@@ -1,0 +1,1155 @@
+/**
+ * BOP AGENCIA - PHASE 11A.1
+ * BOB WEB ASSISTANT - UI SHELL / BRAND STYLES
+ * 
+ * Strict Brand Guidelines:
+ * - Pure UI/UX frontend styling
+ * - Seamless Light & Dark mode support
+ * - Clean editorial styling matching Bop Agencia design system
+ * - Zero intrusive animations, zero generic bubbles
+ */
+
+/* ==========================================================================
+   1. ROOT VARIABLES & THEME TOKENS FOR BOB ASSISTANT
+   ========================================================================== */
+:root {
+  --bob-launcher-size: 60px;
+  --bob-launcher-bottom: 24px;
+  --bob-launcher-right: 24px;
+  --bob-panel-width: 390px;
+  --bob-panel-max-height: min(620px, calc(100vh - 120px));
+  --bob-radius-outer: 24px;
+  --bob-radius-inner: 18px;
+  --bob-radius-bubble: 16px;
+
+  /* Light Theme Tokens */
+  --bob-bg-panel: #ffffff;
+  --bob-bg-header: #f8fafc;
+  --bob-bg-surface: #f8fafc;
+  --bob-bg-hover: #f1f5f9;
+  --bob-border-color: rgba(15, 23, 42, 0.08);
+  --bob-border-strong: rgba(15, 23, 42, 0.14);
+  --bob-shadow-panel: 0 20px 48px -10px rgba(0, 0, 0, 0.16), 0 0 1px 1px rgba(15, 23, 42, 0.06);
+  --bob-shadow-launcher: 0 10px 28px -6px rgba(245, 158, 11, 0.32), 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  --bob-text-main: #090a0f;
+  --bob-text-muted: #64748b;
+  --bob-text-dim: #94a3b8;
+
+  --bob-bot-msg-bg: #f1f5f9;
+  --bob-bot-msg-text: #0f172a;
+  --bob-bot-msg-border: rgba(15, 23, 42, 0.06);
+
+  --bob-user-msg-bg: #f59e0b;
+  --bob-user-msg-text: #090a0f;
+
+  --bob-chip-bg: #ffffff;
+  --bob-chip-border: rgba(15, 23, 42, 0.12);
+  --bob-chip-text: #0f172a;
+  --bob-chip-hover-bg: #fffbeb;
+  --bob-chip-hover-border: #f59e0b;
+
+  --bob-input-bg: #ffffff;
+  --bob-input-border: rgba(15, 23, 42, 0.14);
+  --bob-input-focus-border: #f59e0b;
+  --bob-input-placeholder: #94a3b8;
+}
+
+[data-theme="dark"] {
+  /* Dark Theme Tokens (Obsidian / Graphite / Amber) */
+  --bob-bg-panel: #0e1118;
+  --bob-bg-header: #141822;
+  --bob-bg-surface: #11141c;
+  --bob-bg-hover: #1e2433;
+  --bob-border-color: rgba(255, 255, 255, 0.08);
+  --bob-border-strong: rgba(255, 255, 255, 0.16);
+  --bob-shadow-panel: 0 24px 56px -12px rgba(0, 0, 0, 0.72), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+  --bob-shadow-launcher: 0 12px 30px -4px rgba(245, 158, 11, 0.35), 0 6px 16px rgba(0, 0, 0, 0.45);
+
+  --bob-text-main: #f8fafc;
+  --bob-text-muted: #94a3b8;
+  --bob-text-dim: #64748b;
+
+  --bob-bot-msg-bg: #191f2d;
+  --bob-bot-msg-text: #f1f5f9;
+  --bob-bot-msg-border: rgba(255, 255, 255, 0.07);
+
+  --bob-user-msg-bg: #f59e0b;
+  --bob-user-msg-text: #090a0f;
+
+  --bob-chip-bg: #161b26;
+  --bob-chip-border: rgba(255, 255, 255, 0.12);
+  --bob-chip-text: #f1f5f9;
+  --bob-chip-hover-bg: rgba(245, 158, 11, 0.12);
+  --bob-chip-hover-border: #f59e0b;
+
+  --bob-input-bg: #121620;
+  --bob-input-border: rgba(255, 255, 255, 0.14);
+  --bob-input-focus-border: #f59e0b;
+  --bob-input-placeholder: #64748b;
+}
+
+/* ==========================================================================
+   2. FLOATING LAUNCHER (#bobAssistantLauncher)
+   ========================================================================== */
+#bobAssistantLauncher {
+  position: fixed;
+  bottom: var(--bob-launcher-bottom);
+  right: var(--bob-launcher-right);
+  height: var(--bob-launcher-size);
+  border-radius: 999px;
+  border: 1px solid var(--bob-border-strong);
+  background: var(--bob-bg-panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--bob-shadow-launcher);
+  cursor: pointer;
+  z-index: 9980;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 4px 5px 4px 18px;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s ease,
+              border-color 0.22s ease,
+              padding 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+#bobAssistantLauncher:hover {
+  transform: translateY(-2px);
+  border-color: #f59e0b;
+  box-shadow: 0 14px 34px -4px rgba(245, 158, 11, 0.42), 0 6px 16px rgba(0, 0, 0, 0.16);
+}
+
+#bobAssistantLauncher:hover .bob-launcher-pill-arrow {
+  transform: translateX(2px);
+  color: #f59e0b;
+}
+
+#bobAssistantLauncher:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 3px;
+}
+
+#bobAssistantLauncher:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Integrated Label Pill */
+.bob-launcher-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--bob-text-main);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 1;
+  max-width: 160px;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              max-width 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bob-launcher-pill-text {
+  display: inline-block;
+  line-height: 1;
+}
+
+.bob-launcher-pill-arrow {
+  color: var(--brand-amber);
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.bob-launcher-inner {
+  position: relative;
+  width: calc(var(--bob-launcher-size) - 10px);
+  height: calc(var(--bob-launcher-size) - 10px);
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid rgba(245, 158, 11, 0.45);
+  pointer-events: none;
+}
+
+.bob-launcher-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  border-radius: 50%;
+  display: block;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.bob-launcher-badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 12px;
+  height: 12px;
+  background-color: #10b981;
+  border: 2px solid var(--bob-bg-panel);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bob-launcher-close-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.6) rotate(-90deg);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--bob-text-main);
+  pointer-events: none;
+}
+
+.bob-launcher-close-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+}
+
+/* Launcher state when panel is open */
+#bobAssistantLauncher.is-open {
+  padding: 0;
+  width: var(--bob-launcher-size);
+  justify-content: center;
+  border-radius: 50%;
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+#bobAssistantLauncher.is-open .bob-launcher-pill {
+  opacity: 0;
+  max-width: 0;
+  transform: translateX(10px);
+  margin: 0;
+  overflow: hidden;
+  display: none;
+}
+
+#bobAssistantLauncher.is-open .bob-launcher-inner {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+#bobAssistantLauncher.is-open .bob-launcher-avatar,
+#bobAssistantLauncher.is-open .bob-launcher-badge {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+#bobAssistantLauncher.is-open .bob-launcher-close-icon {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+/* ==========================================================================
+   3. PANEL SHELL (#bobAssistantPanel)
+   ========================================================================== */
+#bobAssistantPanel {
+  position: fixed;
+  bottom: calc(var(--bob-launcher-bottom) + var(--bob-launcher-size) + 14px);
+  right: var(--bob-launcher-right);
+  width: var(--bob-panel-width);
+  max-height: var(--bob-panel-max-height);
+  height: 610px;
+  background-color: var(--bob-bg-panel, #ffffff);
+  border: 1px solid var(--bob-border-color);
+  border-radius: var(--bob-radius-outer);
+  box-shadow: var(--bob-shadow-panel);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 9979;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(18px) scale(0.97);
+  transform-origin: bottom right;
+  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.24s;
+  will-change: transform, opacity;
+}
+
+#bobAssistantPanel.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* ==========================================================================
+   4. PANEL HEADER
+   ========================================================================== */
+.bob-panel-header {
+  padding: 14px 18px;
+  background-color: var(--bob-bg-header, #f8fafc);
+  border-bottom: 1px solid var(--bob-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.bob-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.bob-header-avatar-wrap {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bob-bg-surface);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.bob-header-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+}
+
+.bob-status-indicator {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 9px;
+  height: 9px;
+  background: #10b981;
+  border: 1.5px solid var(--bob-bg-header);
+  border-radius: 50%;
+}
+
+.bob-header-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bob-header-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bob-header-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--bob-text-main);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.bob-header-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border-radius: 4px;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.bob-header-subtitle {
+  font-size: 12px;
+  color: var(--bob-text-muted);
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bob-header-status-text {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.bob-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.bob-header-btn {
+  background: transparent;
+  border: none;
+  color: var(--bob-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.18s ease, color 0.18s ease;
+  outline: none;
+}
+
+.bob-header-btn:hover {
+  background-color: var(--bob-bg-hover);
+  color: var(--bob-text-main);
+}
+
+.bob-header-btn:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 1px;
+}
+
+.bob-header-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* ==========================================================================
+   5. CONVERSATION AREA (#bobConversation)
+   ========================================================================== */
+#bobConversation {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom discreet scrollbar */
+#bobConversation::-webkit-scrollbar {
+  width: 5px;
+}
+#bobConversation::-webkit-scrollbar-track {
+  background: transparent;
+}
+#bobConversation::-webkit-scrollbar-thumb {
+  background: var(--bob-border-strong);
+  border-radius: 4px;
+}
+#bobConversation::-webkit-scrollbar-thumb:hover {
+  background: var(--bob-text-dim);
+}
+
+/* ==========================================================================
+   6. WELCOME STAGE & HERO BOB PRESENCE
+   ========================================================================== */
+.bob-welcome-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 18px 14px 14px;
+  background: var(--bob-bg-surface);
+  border: 1px solid var(--bob-border-color);
+  border-radius: var(--bob-radius-inner);
+  margin-bottom: 2px;
+  animation: bobFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bob-welcome-visual-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bob-welcome-visual-bg {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.02) 70%, transparent 100%);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+}
+
+.bob-welcome-visual-img {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 50%;
+  border: 2px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 8px 22px -4px rgba(0, 0, 0, 0.18);
+  display: block;
+}
+
+.bob-welcome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  margin-bottom: 8px;
+}
+
+.bob-welcome-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #f59e0b;
+}
+
+.bob-welcome-headline {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--bob-text-main);
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.bob-welcome-subtext {
+  font-size: 12.5px;
+  color: var(--bob-text-muted);
+  line-height: 1.45;
+  max-width: 280px;
+  margin: 0 auto 12px;
+}
+
+/* Language selection bar in welcome */
+.bob-lang-picker-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.bob-lang-btn {
+  flex: 1;
+  max-width: 135px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1.5px solid var(--bob-chip-border);
+  background: var(--bob-chip-bg);
+  color: var(--bob-chip-text);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px; /* WCAG 44px touch target */
+  outline: none;
+}
+
+.bob-lang-btn:hover {
+  background: var(--bob-chip-hover-bg);
+  border-color: var(--bob-chip-hover-border);
+  color: #f59e0b;
+  transform: translateY(-1px);
+}
+
+.bob-lang-btn:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+.bob-lang-btn.is-active {
+  background: #f59e0b;
+  color: #090a0f;
+  border-color: #f59e0b;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   7. MESSAGE BUBBLES & EDITORIAL THREAD
+   ========================================================================== */
+.bob-msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: 100%;
+  animation: bobMsgSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bob-msg-row.is-user {
+  justify-content: flex-end;
+}
+
+.bob-msg-row.is-bot {
+  justify-content: flex-start;
+}
+
+.bob-msg-bot-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  flex-shrink: 0;
+  overflow: hidden;
+  margin-bottom: 2px;
+}
+
+.bob-msg-bot-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+
+.bob-msg-bubble {
+  max-width: 82%;
+  padding: 10px 14px;
+  border-radius: var(--bob-radius-bubble);
+  font-size: 13px;
+  line-height: 1.48;
+  word-wrap: break-word;
+  position: relative;
+}
+
+.bob-msg-row.is-bot .bob-msg-bubble {
+  background: var(--bob-bot-msg-bg);
+  color: var(--bob-bot-msg-text);
+  border: 1px solid var(--bob-bot-msg-border);
+  border-bottom-left-radius: 4px;
+}
+
+.bob-msg-row.is-user .bob-msg-bubble {
+  background: var(--bob-user-msg-bg);
+  color: var(--bob-user-msg-text);
+  font-weight: 500;
+  border-bottom-right-radius: 4px;
+}
+
+.bob-msg-cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #f59e0b;
+  color: #090a0f !important;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  min-height: 34px;
+}
+
+.bob-msg-cta-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+.bob-msg-cta-link svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+}
+
+/* Safe formatted content (paragraphs, bullets, whitelisted links) */
+.bob-msg-content p.bob-msg-p {
+  margin: 0 0 7px 0;
+  line-height: 1.5;
+}
+
+.bob-msg-content p.bob-msg-p:last-child {
+  margin-bottom: 0;
+}
+
+.bob-msg-content .bob-msg-bullets {
+  margin: 4px 0 8px 16px;
+  padding: 0;
+  list-style: disc;
+}
+
+.bob-msg-content .bob-msg-bullet-item {
+  margin-bottom: 4px;
+  line-height: 1.45;
+}
+
+.bob-msg-content .bob-msg-link,
+.bob-inline-link {
+  color: #f59e0b;
+  text-decoration: underline;
+  text-underline-offset: 2.5px;
+  font-weight: 600;
+  transition: color 0.18s ease;
+}
+
+.bob-msg-content .bob-msg-link:hover,
+.bob-inline-link:hover {
+  color: #d97706;
+}
+
+[data-theme="dark"] .bob-msg-content .bob-msg-link:hover,
+[data-theme="dark"] .bob-inline-link:hover {
+  color: #fbbf24;
+}
+
+/* Discreet Sources UI with native <details> */
+.bob-msg-sources-details {
+  margin-top: 9px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--bob-border-color);
+  font-size: 11.5px;
+}
+
+.bob-msg-sources-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--bob-text-muted);
+  font-weight: 600;
+  user-select: none;
+  list-style: none;
+  transition: color 0.18s ease;
+}
+
+.bob-msg-sources-summary::-webkit-details-marker {
+  display: none;
+}
+
+.bob-msg-sources-summary:hover {
+  color: #f59e0b;
+}
+
+.bob-msg-sources-summary:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.bob-sources-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.bob-sources-chevron {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bob-msg-sources-details[open] .bob-sources-chevron {
+  transform: rotate(180deg);
+}
+
+.bob-msg-sources-list {
+  margin: 6px 0 2px 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bob-msg-source-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--bob-text-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.bob-source-bullet {
+  color: #f59e0b;
+  font-weight: bold;
+}
+
+/* WhatsApp CTA Button in Messages */
+.bob-msg-cta-link.bob-cta-whatsapp {
+  background: #25d366;
+  color: #090a0f !important;
+}
+
+.bob-msg-cta-link.bob-cta-whatsapp:hover {
+  background: #22bf5b;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
+}
+
+/* ==========================================================================
+   8. QUICK ACTIONS CONTAINER
+   ========================================================================== */
+.bob-quick-actions-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  margin-top: 2px;
+  animation: bobFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bob-quick-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 13px;
+  background: var(--bob-chip-bg);
+  color: var(--bob-chip-text);
+  border: 1px solid var(--bob-chip-border);
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-height: 44px; /* Accessible touch target */
+  outline: none;
+}
+
+.bob-quick-action-btn:hover {
+  background: var(--bob-chip-hover-bg);
+  border-color: var(--bob-chip-hover-border);
+  color: #f59e0b;
+  transform: translateX(2px);
+}
+
+.bob-quick-action-btn:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 1px;
+}
+
+.bob-quick-action-arrow {
+  flex-shrink: 0;
+  color: var(--bob-text-muted);
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+
+.bob-quick-action-btn:hover .bob-quick-action-arrow {
+  color: #f59e0b;
+  transform: translateX(2px);
+}
+
+/* ==========================================================================
+   9. TYPING / TRANSITION PLACEHOLDER (Phase 11A.6)
+   ========================================================================== */
+.bob-typing-indicator,
+.bob-typing-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bob-bot-msg-bg);
+  border: 1px solid var(--bob-bot-msg-border);
+  border-radius: var(--bob-radius-bubble);
+  border-bottom-left-radius: 4px;
+  width: fit-content;
+}
+
+.bob-typing-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bob-text-muted);
+}
+
+.bob-typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3.5px;
+}
+
+.bob-typing-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--bob-text-muted);
+  border-radius: 50%;
+  animation: bobTypingBounce 1.2s infinite ease-in-out;
+}
+
+.bob-typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.bob-typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes bobTypingBounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   10. COMPOSER / INPUT SECTION
+   ========================================================================== */
+.bob-panel-composer {
+  padding: 10px 14px 12px;
+  background: var(--bob-bg-header);
+  border-top: 1px solid var(--bob-border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.bob-composer-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.bob-composer-input {
+  flex: 1;
+  height: 42px;
+  padding: 0 14px;
+  background: var(--bob-input-bg);
+  color: var(--bob-text-main);
+  border: 1px solid var(--bob-input-border);
+  border-radius: 12px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.bob-composer-input::placeholder {
+  color: var(--bob-input-placeholder);
+}
+
+.bob-composer-input:focus {
+  border-color: var(--bob-input-focus-border);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+}
+
+.bob-composer-send-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: none;
+  background: #f59e0b;
+  color: #090a0f;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.18s ease, background-color 0.18s ease, opacity 0.18s ease;
+  outline: none;
+}
+
+.bob-composer-send-btn:hover {
+  transform: translateY(-1px);
+  background: #fbbf24;
+}
+
+.bob-composer-send-btn:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+.bob-composer-send-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.bob-composer-send-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bob-composer-send-btn svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+}
+
+/* ==========================================================================
+   11. FOOTER STATUS META (Discreet microlegend)
+   ========================================================================== */
+.bob-panel-footer-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  font-size: 11px;
+  color: var(--bob-text-dim);
+  line-height: 1.2;
+}
+
+.bob-meta-disclaimer {
+  letter-spacing: 0.01em;
+}
+
+.bob-meta-brand {
+  font-weight: 600;
+  color: var(--bob-text-muted);
+}
+
+/* ==========================================================================
+   12. ANIMATIONS & TRANSITIONS (150ms–280ms)
+   ========================================================================== */
+@keyframes bobFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bobMsgSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   13. RESPONSIVE DESIGN (Desktop, Tablet, Mobile)
+   ========================================================================== */
+@media (max-width: 768px) {
+  :root {
+    --bob-launcher-size: 54px;
+    --bob-launcher-bottom: 20px;
+    --bob-launcher-right: 18px;
+    --bob-panel-width: calc(100vw - 32px);
+    --bob-panel-max-height: min(580px, calc(100dvh - 100px));
+  }
+
+  #bobAssistantPanel {
+    right: 16px;
+    left: 16px;
+    width: auto;
+    bottom: calc(var(--bob-launcher-bottom) + var(--bob-launcher-size) + 12px);
+  }
+
+  .bob-welcome-visual-wrap {
+    width: 100px;
+    height: 100px;
+  }
+  .bob-welcome-visual-img {
+    width: 86px;
+    height: 86px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --bob-launcher-size: 52px;
+    --bob-launcher-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    --bob-launcher-right: 16px;
+    --bob-panel-max-height: min(560px, calc(100dvh - 90px));
+  }
+
+  #bobAssistantPanel {
+    right: 12px;
+    left: 12px;
+    bottom: calc(var(--bob-launcher-bottom) + var(--bob-launcher-size) + 10px);
+    border-radius: 20px;
+  }
+
+  .bob-panel-header {
+    padding: 12px 14px;
+  }
+
+  #bobConversation {
+    padding: 12px 12px 10px;
+    gap: 12px;
+  }
+
+  .bob-msg-bubble {
+    max-width: 88%;
+    font-size: 12.5px;
+    padding: 9px 12px;
+  }
+
+  .bob-panel-composer {
+    padding: 8px 12px 10px;
+  }
+}
+
+/* On very compact screens (<390px), allow pill label to hide to prevent covering interactive buttons */
+@media (max-width: 389px) {
+  #bobAssistantLauncher {
+    padding: 0;
+    width: var(--bob-launcher-size);
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .bob-launcher-pill {
+    display: none;
+  }
+
+  .bob-launcher-inner {
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(245, 158, 11, 0.45);
+  }
+}
+
+/* Accessibility: Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .bob-typing-dot {
+    animation: none !important;
+    opacity: 0.7;
+  }
+  .bob-sources-chevron {
+    transition: none !important;
+  }
+}

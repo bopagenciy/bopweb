@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BOP Agencia — Prueba Aislada Robot Interactivo</title>
+  <style>
+    :root {
+      --bg-color: #090a0f;
+      --accent: #f59e0b;
+      --accent-glow: rgba(245, 158, 11, 0.35);
+      --card-bg: rgba(18, 20, 29, 0.85);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f3f4f6;
+      --text-dim: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.4s ease;
+      touch-action: pan-y;
+    }
+
+    /* Ambient background glows */
+    .ambient-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(circle at 50% 50%, var(--accent-glow) 0%, transparent 60%);
+      opacity: 0.6;
+      transition: opacity 0.4s ease;
+    }
+
+    /* Top bar */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(9, 10, 15, 0.6);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    /* Main Stage */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 5;
+      padding: 20px;
+    }
+
+    .robot-stage {
+      position: relative;
+      width: min(85vw, 560px);
+      aspect-ratio: 1 / 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      cursor: ew-resize;
+    }
+
+    /* Instant LCP image fallback (Frame 24 - Center) */
+    .robot-initial {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      z-index: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .robot-initial.loaded-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Interactive 2D Canvas */
+    .robot-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 2;
+      display: block;
+    }
+
+    /* Cursor guide indicators */
+    .orientation-guide {
+      position: absolute;
+      bottom: -28px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+    }
+
+    .orientation-guide span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .orientation-guide span.center-indicator {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Debug Temporal: Indicadores de Orientación y Mapping */
+    .mapping-debug-bar {
+      margin-bottom: 24px;
+      padding: 12px 20px;
+      background: var(--card-bg);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      z-index: 10;
+      backdrop-filter: blur(12px);
+    }
+
+    .zone-indicators {
+      display: flex;
+      gap: 10px;
+    }
+
+    .zone-pill {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .zone-pill:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+
+    .zone-pill.active {
+      background: #f59e0b;
+      color: #090a0f;
+      border-color: #fbbf24;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+      transform: scale(1.04);
+    }
+
+    .debug-data-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-dim);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .debug-data-strip strong {
+      color: #fbbf24;
+    }
+
+    /* Diagnostic HUD / Controls */
+    .hud-card {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      max-width: 820px;
+      margin: 0 auto;
+      z-index: 20;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .metric-item {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .metric-value.highlight {
+      color: #fbbf24;
+    }
+
+    /* Progress bar */
+    .progress-container {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      width: 0%;
+      transition: width 0.15s ease-out;
+    }
+
+    /* Controls bar */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+    }
+
+    .bg-switcher {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bg-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .bg-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .bg-btn.active {
+      border-color: #fbbf24;
+      transform: scale(1.2);
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+
+    .toggle-label input {
+      accent-color: #f59e0b;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .hud-card {
+        padding: 12px 14px;
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+      }
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      .robot-stage {
+        width: min(90vw, 400px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow" id="ambientGlow"></div>
+
+  <header>
+    <div class="brand">
+      <span class="brand-badge">BOP Engine</span>
+      <span class="brand-title">Robot Interactivo — Test Aislado</span>
+    </div>
+    <div style="font-size: 12px; color: var(--text-dim);">
+      Secuencia WebP Transparente (49 frames)
+    </div>
+  </header>
+
+  <main id="mainContainer">
+    <!-- 0. DEBUG TEMPORAL: INDICADORES VISIBLES Y SIMULADOR DE EXTREMOS -->
+    <div class="mapping-debug-bar" id="mappingDebugBar">
+      <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700;">
+        Validación de Mapping Horizontal (Orientación Visual Real)
+      </div>
+      <div class="zone-indicators">
+        <button type="button" class="zone-pill" id="zoneLeft" onclick="simulatePosition(0)" title="Simular extremo izquierdo (ratio = 0)">
+          LEFT ◀ (Mira Izquierda)
+        </button>
+        <button type="button" class="zone-pill active" id="zoneCenter" onclick="simulatePosition(0.5)" title="Simular centro (ratio = 0.5)">
+          CENTER ● (Mira Frente)
+        </button>
+        <button type="button" class="zone-pill" id="zoneRight" onclick="simulatePosition(1)" title="Simular extremo derecho (ratio = 1)">
+          RIGHT ▶ (Mira Derecha)
+        </button>
+      </div>
+      <div class="debug-data-strip">
+        <span>Cursor X: <strong id="debugCursorPct">50.0%</strong></span>
+        <span>•</span>
+        <span>Frame Objetivo: <strong id="debugTargetFrame">24</strong></span>
+        <span>•</span>
+        <span>Frame Renderizado: <strong id="debugRenderedFrame">24 (frame_24.webp)</strong></span>
+      </div>
+    </div>
+
+    <div class="robot-stage" id="robotStage">
+      <!-- 1. Imagen inicial instantánea (LCP): frame 24 = Mirada al frente -->
+      <img 
+        src="assets/media/robot-sequence/frame_24.webp" 
+        alt="BOP Robot Central Frame" 
+        class="robot-initial" 
+        id="robotInitial"
+        width="720"
+        height="720"
+      >
+
+      <!-- 2. Canvas interactivo en tiempo real -->
+      <canvas 
+        id="robotCanvas" 
+        class="robot-canvas" 
+        width="720" 
+        height="720"
+      ></canvas>
+
+      <div class="orientation-guide">
+        <span>◀ Mira Izquierda (Frame 48)</span>
+        <span class="center-indicator">● Frente (Frame 24)</span>
+        <span>Mira Derecha (Frame 00) ▶</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Panel de Diagnóstico & Validación en Producción -->
+  <aside class="hud-card">
+    <div class="hud-header">
+      <span>Métricas y Validación en Runtime</span>
+      <span id="loadStateText">Iniciando precarga...</span>
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-item">
+        <div class="metric-label">FPS Render</div>
+        <div class="metric-value highlight" id="fpsDisplay">-- FPS</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-label">Zona Cursor</div>
+        <div class="metric-value highlight" id="hudZoneDisplay">CENTER</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-label">Cursor Horizontal (%)</div>
+        <div class="metric-value" id="cursorPosDisplay">50.0%</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-label">Frame Objetivo</div>
+        <div class="metric-value highlight" id="hudTargetFrame">24</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-label">Frame Renderizado</div>
+        <div class="metric-value" id="frameDisplay">24 (frame_24.webp)</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-label">Assets Precargados</div>
+        <div class="metric-value" id="loadedCountDisplay">1 / 49</div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <!-- Selector de fondo para validar Chroma y Despill -->
+      <div class="bg-switcher">
+        <span style="color: var(--text-dim); margin-right: 4px;">Fondo de prueba:</span>
+        <button class="bg-btn active" style="background: #090a0f;" title="Dark Mode (Default)" onclick="changeBg('#090a0f', this)"></button>
+        <button class="bg-btn" style="background: #05142b;" title="Deep Cyber Navy" onclick="changeBg('#05142b', this)"></button>
+        <button class="bg-btn" style="background: #1e1302;" title="Warm Amber Dark" onclick="changeBg('#1e1302', this)"></button>
+        <button class="bg-btn" style="background: #f1f5f9;" title="Light Studio (Bordes extremos)" onclick="changeBg('#f1f5f9', this)"></button>
+        <button class="bg-btn" style="background: #991b1b;" title="Red (Comprobar despill)" onclick="changeBg('#991b1b', this)"></button>
+      </div>
+
+      <div class="toggle-group">
+        <label class="toggle-label">
+          <input type="checkbox" id="idleToggle" checked>
+          <span>Idle Animation (Auto-respiración)</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="lerpToggle" checked>
+          <span>Suavizado LERP (Inercia)</span>
+        </label>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // --- CONFIGURACIÓN TÉCNICA ---
+      const TOTAL_FRAMES = 49;
+      const CENTER_FRAME = 24; // Frame exacto de mirada al frente
+      const FRAME_BASE_PATH = 'assets/media/robot-sequence/frame_';
+      const LERP_SPEED = 0.085; // Factor de interpolación para respuesta orgánica
+
+      // --- ELEMENTOS DEL DOM ---
+      const canvas = document.getElementById('robotCanvas');
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const initialImg = document.getElementById('robotInitial');
+      const progressFill = document.getElementById('progressFill');
+      const loadStateText = document.getElementById('loadStateText');
+      const fpsDisplay = document.getElementById('fpsDisplay');
+      const frameDisplay = document.getElementById('frameDisplay');
+      const cursorPosDisplay = document.getElementById('cursorPosDisplay');
+      const loadedCountDisplay = document.getElementById('loadedCountDisplay');
+      const ambientGlow = document.getElementById('ambientGlow');
+      const idleToggle = document.getElementById('idleToggle');
+      const lerpToggle = document.getElementById('lerpToggle');
+
+      // Elementos de depuración temporal
+      const zoneLeft = document.getElementById('zoneLeft');
+      const zoneCenter = document.getElementById('zoneCenter');
+      const zoneRight = document.getElementById('zoneRight');
+      const debugCursorPct = document.getElementById('debugCursorPct');
+      const debugTargetFrame = document.getElementById('debugTargetFrame');
+      const debugRenderedFrame = document.getElementById('debugRenderedFrame');
+      const hudZoneDisplay = document.getElementById('hudZoneDisplay');
+      const hudTargetFrame = document.getElementById('hudTargetFrame');
+
+      // --- ESTADO INTERNO ---
+      const frames = new Array(TOTAL_FRAMES);
+      let loadedFramesCount = 0;
+      let allFramesLoaded = false;
+
+      let targetFrame = CENTER_FRAME;
+      let currentFrame = CENTER_FRAME;
+      let targetRatio = 0.5; // 0 = izquierda, 0.5 = centro, 1 = derecha
+
+      let isInteracting = false;
+      let lastInteractionTime = performance.now();
+      let idleTimeAccumulator = 0;
+
+      // Métricas de FPS
+      let frameCount = 0;
+      let lastFpsTime = performance.now();
+
+      // --- PRECARGA ASÍNCRONA PROGRESIVA ---
+      function getFrameUrl(index) {
+        const padded = String(index).padStart(2, '0');
+        return `${FRAME_BASE_PATH}${padded}.webp`;
+      }
+
+      function preloadSequence() {
+        // Marcamos el frame inicial como precargado
+        frames[CENTER_FRAME] = initialImg;
+        loadedFramesCount = 1;
+        updateProgress();
+
+        // Precarga en abanico: primero los fotogramas cercanos al centro, luego los extremos
+        const loadOrder = [];
+        for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
+          if (CENTER_FRAME - offset >= 0) loadOrder.push(CENTER_FRAME - offset);
+          if (CENTER_FRAME + offset < TOTAL_FRAMES) loadOrder.push(CENTER_FRAME + offset);
+        }
+
+        loadOrder.forEach(idx => {
+          const img = new Image();
+          img.src = getFrameUrl(idx);
+          img.onload = () => {
+            frames[idx] = img;
+            loadedFramesCount++;
+            updateProgress();
+            if (loadedFramesCount === TOTAL_FRAMES) {
+              allFramesLoaded = true;
+              loadStateText.textContent = '100% Precargado en memoria (Buffer listo)';
+              loadStateText.style.color = '#34d399';
+              // Ocultamos la imagen inicial una vez que el canvas tiene el control
+              initialImg.classList.add('loaded-hidden');
+            }
+          };
+          img.onerror = () => {
+            console.error(`Error al cargar frame ${idx}: ${img.src}`);
+          };
+        });
+      }
+
+      function updateProgress() {
+        const pct = Math.round((loadedFramesCount / TOTAL_FRAMES) * 100);
+        progressFill.style.width = `${pct}%`;
+        loadedCountDisplay.textContent = `${loadedFramesCount} / ${TOTAL_FRAMES}`;
+        if (!allFramesLoaded) {
+          loadStateText.textContent = `Precargando fotogramas: ${pct}%`;
+        }
+      }
+
+      // --- DIBUJADO EN CANVAS ---
+      function drawFrame(frameIdx) {
+        const validIdx = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.round(frameIdx)));
+        const imgToDraw = frames[validIdx] || frames[CENTER_FRAME] || initialImg;
+
+        if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth > 0) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(imgToDraw, 0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      // --- CONTROL DEL MOUSE / CURSOR (DESKTOP) ---
+      function handlePointerMove(clientX) {
+        isInteracting = true;
+        lastInteractionTime = performance.now();
+
+        // Normalizamos X entre 0.0 (extremo izquierdo) y 1.0 (extremo derecho)
+        const winWidth = window.innerWidth;
+        const normalizedX = Math.max(0, Math.min(1, clientX / winWidth));
+        targetRatio = normalizedX;
+
+        // Mapeo corregido a la orientación visual real:
+        // 0.0 (Izquierda de pantalla) -> Frame 48 (Robot mira izquierda)
+        // 0.5 (Centro de pantalla)    -> Frame 24 (Robot mira al frente)
+        // 1.0 (Derecha de pantalla)   -> Frame 00 (Robot mira derecha)
+        targetFrame = (1 - normalizedX) * (TOTAL_FRAMES - 1);
+
+        // Actualizamos sutilmente el resplandor ambiental hacia la posición del cursor
+        ambientGlow.style.background = `radial-gradient(circle at ${Math.round(normalizedX * 100)}% 50%, var(--accent-glow) 0%, transparent 60%)`;
+      }
+
+      // Función pública para simulación de extremos (ratio: 0, 0.5, 1)
+      window.simulatePosition = function (ratio) {
+        handlePointerMove(ratio * window.innerWidth);
+      };
+
+      window.addEventListener('mousemove', (e) => {
+        handlePointerMove(e.clientX);
+      }, { passive: true });
+
+      // --- CONTROL TÁCTIL (MOBILE TOUCH SCRUB) ---
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 0) {
+          handlePointerMove(e.touches[0].clientX);
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+          handlePointerMove(e.touches[0].clientX);
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchend', () => {
+        isInteracting = false;
+        lastInteractionTime = performance.now();
+      }, { passive: true });
+
+      // --- BUCLE DE RENDERIZADO (rAF + LERP) ---
+      function renderLoop(now) {
+        // Cálculo de FPS
+        frameCount++;
+        if (now - lastFpsTime >= 1000) {
+          const fps = Math.round((frameCount * 1000) / (now - lastFpsTime));
+          fpsDisplay.textContent = `${fps} FPS`;
+          frameCount = 0;
+          lastFpsTime = now;
+        }
+
+        // Lógica de IDLE / Auto-respiración si no hay interacción durante 2.5s
+        const timeSinceInteraction = now - lastInteractionTime;
+        if (!isInteracting && timeSinceInteraction > 2500 && idleToggle.checked) {
+          idleTimeAccumulator += 0.015;
+          // Oscilación senoidal suave de baja amplitud alrededor del centro (mirada sutil)
+          const idleWave = Math.sin(idleTimeAccumulator) * 0.18; // ± 18% del rango
+          targetRatio = 0.5 + idleWave;
+          targetFrame = (1 - targetRatio) * (TOTAL_FRAMES - 1);
+        }
+
+        // Suavizado LERP (Linear Interpolation)
+        if (lerpToggle.checked) {
+          currentFrame += (targetFrame - currentFrame) * LERP_SPEED;
+        } else {
+          currentFrame = targetFrame;
+        }
+
+        // Dibujar en canvas
+        drawFrame(currentFrame);
+
+        // Actualizar HUD y diagnóstico de depuración
+        const currentIdxDisplay = Math.round(currentFrame);
+        const paddedCurrent = String(currentIdxDisplay).padStart(2, '0');
+        const targetIdxDisplay = Math.round(targetFrame);
+        const cursorPct = (targetRatio * 100).toFixed(1);
+
+        // Identificación de zona activa
+        let activeZone = 'CENTER';
+        if (targetRatio < 0.35) {
+          activeZone = 'LEFT';
+        } else if (targetRatio > 0.65) {
+          activeZone = 'RIGHT';
+        }
+
+        // 1. Indicadores visuales en la barra superior de debug
+        if (zoneLeft && zoneCenter && zoneRight) {
+          zoneLeft.classList.toggle('active', activeZone === 'LEFT');
+          zoneCenter.classList.toggle('active', activeZone === 'CENTER');
+          zoneRight.classList.toggle('active', activeZone === 'RIGHT');
+        }
+
+        if (debugCursorPct) debugCursorPct.textContent = `${cursorPct}%`;
+        if (debugTargetFrame) debugTargetFrame.textContent = `${targetIdxDisplay}`;
+        if (debugRenderedFrame) debugRenderedFrame.textContent = `${currentIdxDisplay} (frame_${paddedCurrent}.webp)`;
+
+        // 2. HUD Metrics card inferior
+        frameDisplay.textContent = `${currentIdxDisplay} (frame_${paddedCurrent}.webp)`;
+        cursorPosDisplay.textContent = `${cursorPct}%`;
+        if (hudTargetFrame) hudTargetFrame.textContent = `${targetIdxDisplay}`;
+        if (hudZoneDisplay) hudZoneDisplay.textContent = activeZone;
+
+        requestAnimationFrame(renderLoop);
+      }
+
+      // --- SELECTOR DE FONDO PARA TEST DE CHROMA ---
+      window.changeBg = function (color, btn) {
+        document.body.style.backgroundColor = color;
+        document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+
+        // Adaptar contraste del texto si el fondo es claro
+        const isLight = color === '#f1f5f9';
+        document.body.style.color = isLight ? '#0f172a' : '#f3f4f6';
+        const brandBadge = document.querySelector('.brand-badge');
+        if (brandBadge) {
+          brandBadge.style.color = isLight ? '#b45309' : '#fbbf24';
+        }
+      };
+
+      // Iniciar precarga y bucle
+      preloadSequence();
+      requestAnimationFrame(renderLoop);
+
+    })();
+  </script>
+</body>
+</html>
